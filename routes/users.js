@@ -29,4 +29,50 @@ router.get("/:id", async (req, res) => {
     res.json(user);
 });
 
+// POST /users
+router.post("/", async (req, res) => {
+
+    const users = await fs.readJson(filePath);
+
+    const { firstName, lastName, email, department } = req.body;
+
+    // Validation
+    if (!firstName || !lastName || !email || !department) {
+        return res.status(400).json({
+            message: "All fields are required"
+        });
+    }
+
+    // Check duplicate email
+    const existingUser = users.find(
+        u => u.email.toLowerCase() === email.toLowerCase()
+    );
+
+    if (existingUser) {
+        return res.status(409).json({
+            message: "Email already exists"
+        });
+    }
+
+    // Generate next ID
+    const nextId =
+        users.length > 0
+            ? Math.max(...users.map(u => u.id)) + 1
+            : 1;
+
+    const newUser = {
+        id: nextId,
+        firstName,
+        lastName,
+        email,
+        department
+    };
+
+    users.push(newUser);
+
+    await fs.writeJson(filePath, users, { spaces: 2 });
+
+    res.status(201).json(newUser);
+});
+
 module.exports = router;
