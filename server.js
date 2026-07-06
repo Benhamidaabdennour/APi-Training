@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const usersRouter = require("./routes/users");
+const { router: authRouter } = require("./routes/auth");
 const app = express();
 
 app.use(cors());
@@ -14,6 +15,7 @@ app.get("/", (req, res) => {
         message: "API Training is running 🚀"
     });
 });
+app.use("/auth", authRouter);
 app.use("/users", usersRouter);
 
 const PORT = process.env.PORT || 3000;
