@@ -11,26 +11,53 @@ router.get("/", async (req, res) => {
 
     let users = await fs.readJson(filePath);
 
-    const { department, active } = req.query;
+    const {
+        department,
+        active,
+        search
+    } = req.query;
 
     // Filter by department
     if (department) {
-        users = users.filter(
-            user =>
-                user.department.toLowerCase() === department.toLowerCase()
+        users = users.filter(user =>
+            user.department.toLowerCase() === department.toLowerCase()
         );
     }
 
     // Filter by active status
     if (active !== undefined) {
-        users = users.filter(
-            user => user.active === (active === "true")
+        users = users.filter(user =>
+            user.active === (active === "true")
         );
+    }
+
+    // Search
+    if (search) {
+
+        const term = search.toLowerCase();
+
+        users = users.filter(user =>
+
+            user.firstName.toLowerCase().includes(term) ||
+
+            user.lastName.toLowerCase().includes(term) ||
+
+            user.email.toLowerCase().includes(term) ||
+
+            user.phone.toLowerCase().includes(term) ||
+
+            user.department.toLowerCase().includes(term) ||
+
+            user.jobTitle.toLowerCase().includes(term)
+
+        );
+
     }
 
     res.json(users);
 
 });
+
 // POST /users
 router.post("/", async (req, res) => {
 
