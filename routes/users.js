@@ -161,4 +161,29 @@ router.put("/:id", async (req, res) => {
 
     res.status(200).json(updatedUser);
 
-});module.exports = router;
+});
+// DELETE /users/:id
+router.delete("/:id", async (req, res) => {
+
+    const users = await fs.readJson(filePath);
+
+    const id = Number(req.params.id);
+
+    const userIndex = users.findIndex(u => u.id === id);
+
+    if (userIndex === -1) {
+        return res.status(404).json({
+            message: "User not found"
+        });
+    }
+
+    users.splice(userIndex, 1);
+
+    await fs.writeJson(filePath, users, {
+        spaces: 2
+    });
+
+    res.sendStatus(204);
+
+});
+module.exports = router;
