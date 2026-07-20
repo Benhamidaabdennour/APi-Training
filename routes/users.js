@@ -122,37 +122,30 @@ router.put("/:id", async (req, res) => {
         department
     } = req.body;
 
-    // Validate required fields
-    if (!firstName || !lastName || !email || !department) {
-        return res.status(400).json({
-            message: "All fields are required"
-        });
-    }
+    // Only check duplicate email if an email was provided
+    if (email) {
+        const duplicate = users.find(
+            u => u.email.toLowerCase() === email.toLowerCase() && u.id !== id
+        );
 
-    // Prevent duplicate emails
-    const duplicate = users.find(
-        u => u.email.toLowerCase() === email.toLowerCase() && u.id !== id
-    );
-
-    if (duplicate) {
-        return res.status(409).json({
-            message: "Email already exists"
-        });
+        if (duplicate) {
+            return res.status(409).json({
+                message: "Email already exists"
+            });
+        }
     }
 
     const updatedUser = {
         id,
-        firstName,
-        lastName,
-        email,
-        department
+        firstName: firstName || "",
+        lastName: lastName || "",
+        email: email || "",
+        department: department || ""
     };
 
     users[userIndex] = updatedUser;
 
-    await fs.writeJson(filePath, users, {
-        spaces: 2
-    });
+    await fs.writeJson(filePath, users, { spaces: 2 });
 
     res.json(updatedUser);
 
