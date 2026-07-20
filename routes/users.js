@@ -75,4 +75,28 @@ router.post("/", async (req, res) => {
     res.status(201).json(newUser);
 });
 
+// PATCH /users/:id
+router.patch("/:id", async (req, res) => {
+
+    const users = await fs.readJson(filePath);
+
+    const id = Number(req.params.id);
+
+    const user = users.find(u => u.id === id);
+
+    if (!user) {
+        return res.status(404).json({
+            message: "User not found"
+        });
+    }
+
+    Object.assign(user, req.body);
+
+    await fs.writeJson(filePath, users, {
+        spaces: 2
+    });
+
+    res.json(user);
+
+});
 module.exports = router;
