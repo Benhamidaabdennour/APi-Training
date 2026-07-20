@@ -119,13 +119,19 @@ router.put("/:id", async (req, res) => {
         firstName,
         lastName,
         email,
-        department
+        phone,
+        department,
+        jobTitle,
+        salary,
+        active
     } = req.body;
 
-    // Only check duplicate email if an email was provided
+    // Prevent duplicate emails (only if an email was provided)
     if (email) {
         const duplicate = users.find(
-            u => u.email.toLowerCase() === email.toLowerCase() && u.id !== id
+            u =>
+                u.email.toLowerCase() === email.toLowerCase() &&
+                u.id !== id
         );
 
         if (duplicate) {
@@ -140,14 +146,19 @@ router.put("/:id", async (req, res) => {
         firstName: firstName || "",
         lastName: lastName || "",
         email: email || "",
-        department: department || ""
+        phone: phone || "",
+        department: department || "IT",
+        jobTitle: jobTitle || "",
+        salary: salary ?? 0,
+        active: active ?? true
     };
 
     users[userIndex] = updatedUser;
 
-    await fs.writeJson(filePath, users, { spaces: 2 });
+    await fs.writeJson(filePath, users, {
+        spaces: 2
+    });
 
-    res.json(updatedUser);
+    res.status(200).json(updatedUser);
 
-});
-module.exports = router;
+});module.exports = router;
