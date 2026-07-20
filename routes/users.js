@@ -8,27 +8,29 @@ const filePath = path.join(__dirname, "../data/users.json");
 
 // GET /users
 router.get("/", async (req, res) => {
-    const users = await fs.readJson(filePath);
-    res.json(users);
-});
 
-// GET /users/:id
-router.get("/:id", async (req, res) => {
-    const users = await fs.readJson(filePath);
+    let users = await fs.readJson(filePath);
 
-    const id = Number(req.params.id);
+    const { department, active } = req.query;
 
-    const user = users.find(u => u.id === id);
-
-    if (!user) {
-        return res.status(404).json({
-            message: "User not found"
-        });
+    // Filter by department
+    if (department) {
+        users = users.filter(
+            user =>
+                user.department.toLowerCase() === department.toLowerCase()
+        );
     }
 
-    res.json(user);
-});
+    // Filter by active status
+    if (active !== undefined) {
+        users = users.filter(
+            user => user.active === (active === "true")
+        );
+    }
 
+    res.json(users);
+
+});
 // POST /users
 router.post("/", async (req, res) => {
 
